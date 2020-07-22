@@ -30,7 +30,7 @@ class Products {
       });
       return products;
     } catch (error) {
-      console.error(err);
+      console.log(error);
     }
   }
 }
