@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aliero Housing</title>
+    <!-- font awesome -->
+    <script
+      src="https://kit.fontawesome.com/31462035f2.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ
+    +1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+      crossorigin="anonymous"
+    /> -->
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- navbar -->
+    <nav class="navbar">
+      <div class="navbar-center">
+        <span class="nav-icon">
+          <i class="fas fa-bars"></i>
+        </span>
+        <img src="./images/logo.svg" alt="Store Logo" />
+        <div class="cart-btn">
+          <span class="nav-icon">
+            <i class="fas fa-cart-plus"></i>
+          </span>
+          <div class="cart-items">0</div>
+        </div>
+      </div>
+    </nav>
+    <!-- hero -->
+    <header class="hero">
+      <div class="banner">
+        <h1 class="banner-title">Funiture Collection</h1>
+        <button class="banner-btn">Shop Now</button>
+      </div>
+    </header>
+    <!-- end of navbar -->
+    <!-- products -->
+    <section class="products">
+      <div class="section-title">
+        <h2>our products</h2>
+      </div>
+      <div class="products-center"></div>
+    </section>
+    <!-- end of products -->
+    <!-- cart -->
+    <div class="cart-overlay">
+      <div class="cart">
+        <span class="close-cart">
+          <i class="fas fa-window-close"></i>
+        </span>
+        <h2>Your cart</h2>
+        <div class="cart-content">
+          <!-- cart item -->
+          <div class="cart-item">
+            <img src="./images/product-1.jpeg" alt="product1" />
+            <div>
+              <h4>queen bed</h4>
+              <h5>NGN16,000</h5>
+              <span class="remove-item">remove</span>
+            </div>
+            <div>
+              <i class="fas fa-chevron-up"></i>
+              <p class="item-amount">1</p>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+          <!-- end of cart item -->
+        </div>
+        <div class="cart-footer">
+          <h3>your total : $ <span class="cart-total">0</span></h3>
+          <button class="clear-cart banner-btn">clear cart</button>
+        </div>
+      </div>
+    </div>
+
+<script type='text/javascript'>
+
+// variables
+
+
+
+const cartBtn = document.querySelector(".cart-btn");
+const closeCartBtn = document.querySelector(".close-cart");
+const clearCartBtn = document.querySelector(".clear-cart");
+const cartDOM = document.querySelector(".cart");
+const carOverlay = document.querySelector(".cart-overlay");
+const carItems = document.querySelector(".cart-item");
+const carTotal = document.querySelector(".cart-total");
+const carContent = document.querySelector(".cart-content");
+const productsDOM = document.querySelector(".products-center");
+
+
+
+
+
+
+// cart
+let cart = [];
+// buttons
+let buttonsDOM = [];
+
+cartItems = [];
+
+// getting the products
+class Products {
+async getProducts() {
+  try {
+    let result = await fetch("products.json");
+    let data = await result.json();
+    let products = data.items;
+    products = products.map((item) => {
+      const { title, price } = item.fields;
+      const { id } = item.sys;
+      const image = item.fields.image.fields.file.url;
+      return { title, price, id, image };
+    });
+    return products;
+  } catch (error) {
+    console.log(error);
+  }
+}
+}
+
+
+
+// display products
+class UI {
+displayProducts(products) {
+  let result = "";
+  products.forEach((product) => {
+    result += `
+              <!-- single product1 -->
+      <article class="product">
+        <div class="img-container">
+          <img
+            src=${product.image}
+            alt="product1"
+            class="product-img"
+          />
+          <button class="bag-btn" onclick="saveToLocalStorage()" data-id=${product.id}>
+            <i class="fas fa-shopping-cart"></i>
+            add to bag
+          </button>
+        </div>
+        <h3>${product.title}</h3>
+        <h4>NGN${product.price}</h4>
+      </article>
+      <!-- end of product1 -->        
+      `;
+  });
+  productsDOM.innerHTML = result;
+}
+getBagButtons() {
+  const buttons = [...document.querySelectorAll(".btn-btn")];
+  buttonsDOM = buttons;
+  buttons.forEach((button) => {
+    let id = button.dataset.id;
+    let inCart = cart.find((item) => item.id === id);
+    if (inCart) {
+      buttons.innerText = "In Cart";
+      button.disabled = true;
+    }
+    button.addEventListener("click", (event) => {
+      event.target.innerText = "In Cart";
+      event.target.disabled = true;
+      // get product from products
+      let cartItem = Storage.getProduct(id);
+      console.log(cartItem);
+      // add product to the cart
+      // save caet in local storage
+      // set cart values
+      // display cart items
+      // show the cart
+    });
+  });
+
+
+
+}
+}
+
+
+
+// LOCAL STORAGE
+class Storage {
+static saveProducts(products) {
+  localStorage.setItem("products", JSON.stringify(products));
+}
+static getProduct(id) {
+  let products = JSON.parse(localStorage.getItem("products"));
+  return products.find((product) => product.id == id);
+}
+}
+
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+
+
+
+
+
+
+
+const ui = new UI();
+const products = new Products();
+
+//   get all products
+products
+  .getProducts()
+  .then((products) => {
+    ui.displayProducts(products);
+    Storage.saveProducts(products);
+  })
+  .then(() => {
+    ui.getBagButtons();
+  });
+});
+
+
+// the method start here....
+
+function saveToLocalStorage() {
+
+    if (localStorage){
+
+          const buttons = [...document.querySelectorAll(".bag-btn")];
+
+            buttons.forEach((bagBtn) => {
+
+                bagBtn.addEventListener("click", ()=>{
+
+                    cartItems.push(bagBtn.dataset.id); // insert the cart product id in an Array
+
+                    localStorage.setItem("cartItems", JSON.stringify(cartItems)); // storing the cart product array to local storage
+
+                    console.log(cartItems);
+
+                })
+
+            })
+    }
+}
+
+// end here......
+
+ </script>
+    <!-- end of cart
+     <script type='text/javascript'  crossorigin="anonymous" src="app.js"></script>  -->
+  </body>
+</html>
